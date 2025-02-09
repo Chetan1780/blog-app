@@ -80,7 +80,7 @@ const EditBlog = () => {
   const [file, setFile] = useState(null)
   const navigate = useNavigate();
   const onSubmit = async (data) => {
-    console.log(data);
+    // console.log(data);
     const formData = new FormData();
     formData.append('file',file)
     formData.append('data',JSON.stringify(data));
@@ -113,7 +113,7 @@ const EditBlog = () => {
     form.setValue('content', data);
   }
   if (loading || blodLoading) return <Loading />
-  console.log(categoryData);
+  // console.log(categoryData);
   return (
     <div>
       <Card className='pt-5 max-w-screen-xl mx-auto'>

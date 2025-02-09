@@ -30,7 +30,7 @@ const Users = () => {
     },[referesh]);
 
     const handleDelete = async (id)=>{
-        console.log(id);
+        // console.log(id);
         const temp = await deletedata(`${getEnv('VITE_API_BACKEND_URL')}/user/delete/${id}`)
         if(temp){
             showToast('success','user Deleted!!')
@@ -44,7 +44,7 @@ const Users = () => {
     if (loading) return <Loading />;
     if (error) return <div className="text-red-500">Error: {error.message}</div>;
     
-    console.log(data);
+    // console.log(data);
     
     return (
         <div>

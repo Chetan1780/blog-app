@@ -30,7 +30,7 @@ const EditCategory = () => {
         method: 'get',
         credentials: 'include'
     },[category_id]);
-    console.log(categoryData);;
+    // console.log(categoryData);;
     
     
     const form = useForm({
@@ -58,7 +58,7 @@ const EditCategory = () => {
     
 
       const onSubmit = async (data) => {
-        console.log(data);
+        // console.log(data);
           try{
             const resp = await fetch(`${getEnv('VITE_API_BACKEND_URL')}/category/update/${category_id}`,{
               method: 'PUT',

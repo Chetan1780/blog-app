@@ -28,7 +28,7 @@ const CategoryDetails = () => {
     },[referesh]);
 
     const handleDelete = async (id)=>{
-        console.log(id);
+        // console.log(id);
         const temp = await deletedata(`${getEnv('VITE_API_BACKEND_URL')}/category/delete/${id}`)
         if(temp){
             showToast('success','Category removed!!')
@@ -42,7 +42,7 @@ const CategoryDetails = () => {
     if (loading) return <Loading />;
     if (error) return <div className="text-red-500">Error: {error.message}</div>;
 
-    console.log(categoryData);
+    // console.log(categoryData);
 
     return (
         <div>

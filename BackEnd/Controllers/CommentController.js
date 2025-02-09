@@ -71,7 +71,7 @@ export const getAllComments = async (req,res,next)=>{
 export const deleteComment = async (req,res,next)=>{
     try {
         const {commendId} = req.params;
-        console.log(commendId);
+        (commendId);
         
         await Comment.findByIdAndDelete(commendId)
         res.status(200).json({

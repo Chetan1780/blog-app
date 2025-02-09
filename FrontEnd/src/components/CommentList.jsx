@@ -7,7 +7,7 @@ import moment from 'moment/moment';
 import { Separator } from "@/components/ui/separator"
 
 const CommentList = ({props}) => {
-    console.log(props.blogid)
+    // console.log(props.blogid)
     const { data, loading, error } = usefetch(`${getEnv('VITE_API_BACKEND_URL')}/comment/get-comments/${props.blogid}`, {
         method: 'get',
         credentials: 'include'

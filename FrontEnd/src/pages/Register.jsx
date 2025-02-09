@@ -46,7 +46,7 @@ const Register = () => {
   });
 
   const navigate = useNavigate();
-  console.log(getEnv('VITE_API_BACKEND_URL')); 
+  // console.log(getEnv('VITE_API_BACKEND_URL')); 
 
 const onSubmit = async (data) => {
     try {

@@ -39,7 +39,6 @@ export const likeCount = async (req,res,next)=>{
         let isLikedByUser=false;
         if(userid){
             const getUserLike = await Likes.countDocuments({blogid,userid})
-            console.log(getUserLike)
             if(getUserLike>0) isLikedByUser = true;
         }
         res.status(200).json({

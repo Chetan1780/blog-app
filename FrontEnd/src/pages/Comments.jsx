@@ -29,7 +29,7 @@ const Comments = () => {
     },[referesh]);
 
     const handleDelete = async (id)=>{
-        console.log(id);
+        // console.log(id);
         const temp = await deletedata(`${getEnv('VITE_API_BACKEND_URL')}/comment/delete/${id}`)
         if(temp){
             showToast('success','Comment Deleted!!')
@@ -42,7 +42,7 @@ const Comments = () => {
 
     if (loading) return <Loading />;
     if (error) return <div className="text-red-500">Error: {error.message}</div>;
-    console.log(commentData);
+    // console.log(commentData);
     
 
     return (

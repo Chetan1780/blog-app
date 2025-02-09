@@ -3,7 +3,6 @@ import Category from '../models/CategoryModel.js'
 // add 
 export const addCategory = async (req,res,next)=>{
     try {
-        console.log(req.body.name,req.body.slug);
         const {name,slug} = req.body;
         const category = new Category({name,slug});
         await category.save();

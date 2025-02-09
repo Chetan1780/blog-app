@@ -28,7 +28,7 @@ import { useSelector } from "react-redux";
       method: 'get',
       credentials: 'include'
     }, []);
-    console.log(categoryData);
+    // console.log(categoryData);
     const user = useSelector((state) => state.persistedReducer.user);
     
     

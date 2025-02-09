@@ -38,11 +38,12 @@ const AddCategory = () => {
       },[form.watch('name')])
 
       const onSubmit = async (data) => {
-        console.log(data);
+        // console.log(data);
           try{
             const resp = await fetch(`${getEnv('VITE_API_BACKEND_URL')}/category/add`,{
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
+              credentials:'include',
               body: JSON.stringify(data)
             })   
             const temp = await resp.json() ;

@@ -32,7 +32,7 @@ export const updateUser = async (req,res,next)=>{
             user.password = hashedPassword;
         }
         if(req.file){
-            console.log(req.file);
+            // console.log(req.file);
             const uploadResult = await cloudinary.uploader
             .upload(
                 req.file.path,

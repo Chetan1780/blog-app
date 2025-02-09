@@ -36,7 +36,7 @@ const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const onSubmit = async (data) => {
-    console.log(data);
+    // console.log(data);
       try{
         const resp = await fetch(`${getEnv('VITE_API_BACKEND_URL')}/auth/login`,{
           method: 'POST',
@@ -48,7 +48,7 @@ const Login = () => {
         if(!resp.ok){
           showToast('error',temp.message);return;
         }
-        console.log(temp.user);
+        // console.log(temp.user);
         dispatch(setUser(temp.user));
         navigate(RouteIndex)
         showToast('success',temp.message);

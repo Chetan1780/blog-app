@@ -63,7 +63,7 @@ const AddBlog = () => {
   const [file, setFile] = useState(null)
   const navigate = useNavigate();
   const onSubmit = async (data) => {
-    console.log(data);
+    // console.log(data);
     const newData = {...data,author:user.user._id};
     const formData = new FormData();
     formData.append('file',file)
@@ -97,7 +97,7 @@ const AddBlog = () => {
     form.setValue('content', data);
   }
   if (loading) return <Loading />
-  console.log(categoryData);
+  // console.log(categoryData);
   return (
     <div>
       <Card className='pt-5 max-w-screen-xl mx-auto'>

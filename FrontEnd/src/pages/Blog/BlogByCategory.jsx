@@ -15,7 +15,7 @@ const BlogByCategory = () => {
     }, [category]);
 
     if (loading) return <Loading />;
-    console.log(blogData);
+    // console.log(blogData);
 
     return (
         <>

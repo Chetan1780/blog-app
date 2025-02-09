@@ -29,7 +29,7 @@ const Blog = () => {
     },[referesh]);
 
     const handleDelete = async (id)=>{
-        console.log(id);
+        (id);
         const temp = await deletedata(`${getEnv('VITE_API_BACKEND_URL')}/blog/delete/${id}`)
         if(temp){
             showToast('success','Blog removed!!')
@@ -42,7 +42,7 @@ const Blog = () => {
 
     if (loading) return <Loading />;
     if (error) return <div className="text-red-500">Error: {error.message}</div>;
-    console.log(blogData);
+    // console.log(blogData);
     
     return (
         <div>
