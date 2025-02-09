@@ -6,11 +6,11 @@ import {encode} from 'entities';
 export const addBlog = async (req,res,next)=>{
     try {
         const data = JSON.parse(req.body.data);
-        console.log(data);
+        // console.log(data);
         
         let temp;
         if(req.file){
-            console.log(req.file);
+            // console.log(req.file);
             const uploadResult = await cloudinary.uploader
             .upload(
                 req.file.path,
@@ -43,7 +43,7 @@ export const addBlog = async (req,res,next)=>{
 export const editBlog = async (req,res,next)=>{
     try {
         const data = JSON.parse(req.body.data);
-        console
+        // console
         const blog = Blog.findById(data._id)
         if(req.file){
 
@@ -58,11 +58,11 @@ export const updateBlog = async (req,res,next)=>{
         const {blogid} = req.params;
         const data = JSON.parse(req.body.data);
         const blog = await Blog.findById(blogid);
-        console.log(data);
+        // console.log(data);
         
         let temp;
         if(req.file){
-            console.log(req.file);
+            // console.log(req.file);
             const uploadResult = await cloudinary.uploader
             .upload(
                 req.file.path,
@@ -100,7 +100,7 @@ export const showBlog = async (req,res,next)=>{
 export const deleteBlog = async (req,res,next)=>{
     try {
         const {blogid} = req.params;
-        console.log(blogid);
+        // console.log(blogid);
         const data = await Blog.findByIdAndDelete(blogid)
         res.status(200).json({
             success:true,
@@ -114,7 +114,7 @@ export const allBlog = async (req,res,next)=>{
     try {
         let id;
         let blog;
-        console.log(req.user);
+        // console.log(req.user);
         if(req.user && req.user.role==='admin'){
             blog = await Blog.find().populate('author','name avatar role ').populate('category','name slug').sort({createdAt:-1}).lean().exec();
         } else if(req.user && req.user.role==='user'){
