@@ -23,8 +23,7 @@ import { showToast } from '@/Helper/ShowToast';
 import { removeUser } from '@/redux/user/user.slice';
 import { IoMenu } from "react-icons/io5";
 import { useSidebar } from './ui/sidebar';
-
-
+import Logo from '@/components/Logo'
 
 const Header =  () => {
   const user = useSelector((state) => state.persistedReducer.user);
@@ -51,7 +50,8 @@ const Header =  () => {
           <IoMenu/>
         </button>
       <div className='logo'>
-        <img className='md:w-auto w-24' src={logo} alt="" srcset="" />
+        {/* <img className='md:w-auto w-24' src={logo} alt="" srcset="" /> */}
+        <Logo/>
       </div>
       </div>
       <div className='w-[550px]'>
