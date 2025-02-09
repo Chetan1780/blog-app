@@ -23,7 +23,7 @@ import { showToast } from '@/Helper/ShowToast';
 
 const Blog = () => {
     const [referesh,setRefreshData] = useState(false);
-    const { data: blogData, loading, error } = usefetch(`${getEnv('VITE_API_BACKEND_URL')}/blog/all-blog`, {
+    const { data: blogData, loading, error } = usefetch(`${getEnv('VITE_API_BACKEND_URL')}/blog/all-user-blog`, {
         method: 'get',
         credentials: 'include'
     },[referesh]);
