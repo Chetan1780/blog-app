@@ -8,9 +8,19 @@ import { motion } from 'framer-motion';
 import { FaRegHeart } from "react-icons/fa";
 const LikeCount = ({ props }) => {
   const user = useSelector((state) => state.persistedReducer.user);
-  const { data, loading, error } = usefetch(`${getEnv('VITE_API_BACKEND_URL')}/like/get-like/${props.blogid}/${user.isLoggedIn?user.user._id:''}`, {
-    method: 'get', credentials: 'include'
-  });
+  let data;
+  if(user.isLoggedIn){
+    const { data:likes, loading, error } = usefetch(`${getEnv('VITE_API_BACKEND_URL')}/like/get-like/${props.blogid}/${user.isLoggedIn?user.user._id:" "}`, {
+      method: 'get', credentials: 'include'
+    });
+    data = likes;
+  } else{
+    const { data:likes, loading, error } = usefetch(`${getEnv('VITE_API_BACKEND_URL')}/like/get-like/${props.blogid}`, {
+      method: 'get', credentials: 'include'
+    });
+    data = likes;
+
+  }
 
   const [likeCount, setlikeCount] = useState(0);
   const [animate, setAnimate] = useState(false); 
@@ -21,6 +31,8 @@ const LikeCount = ({ props }) => {
       setLiked(data.isLikedByUser)
     }
   }, [data]);
+  console.log(data);
+  
 
   const handleLike = async () => {
     try {
