@@ -17,7 +17,7 @@ const Layout = () => {
           <Outlet />
         </div>
         {/* footbar  */}
-        <Footer />
+        {/* <Footer /> */}
       </main>
     </SidebarProvider>
   )
