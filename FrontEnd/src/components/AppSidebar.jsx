@@ -35,7 +35,7 @@ import { useSelector } from "react-redux";
     return (
       <Sidebar >
         <SidebarHeader className="bg-white">
-          <img src={logo} width={120} alt="" srcset="" />
+          <img draggable="false" src={logo} width={120} alt="" srcset="" />
         </SidebarHeader>
         <SidebarContent className="bg-white">
           <SidebarGroup >

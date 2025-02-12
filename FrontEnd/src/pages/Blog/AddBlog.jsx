@@ -174,7 +174,7 @@ const AddBlog = () => {
                       <input {...getInputProps()} />
                       <div className='flex justify-center items-center w-36 h-28 rounded-lg border-2 border-dashed'>
                         {preview ? (
-                          <img src={preview} alt="preview" />
+                          <img draggable="false" src={preview} alt="preview" />
                         ) : (
                           <IoCameraOutline size={24} />
                         )}

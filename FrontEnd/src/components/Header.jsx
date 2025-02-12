@@ -50,7 +50,6 @@ const Header =  () => {
           <IoMenu/>
         </button>
       <div className='logo'>
-        {/* <img className='md:w-auto w-24' src={logo} alt="" srcset="" /> */}
         <Logo/>
       </div>
       </div>
@@ -70,7 +69,7 @@ const Header =  () => {
             <Avatar>
                 <AvatarImage src={user.user.avatar || userIcon} />
                 <AvatarFallback>
-                  <img src={userIcon} alt="User Icon" />
+                  <img draggable="false" src={userIcon} alt="User Icon" />
                 </AvatarFallback>
               </Avatar>
 

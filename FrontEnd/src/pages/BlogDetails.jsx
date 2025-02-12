@@ -27,7 +27,7 @@ const BlogDetails = () => {
     if (loading) return <Loading />;
 
     return (
-        <div className="flex flex-col md:flex-row justify-between gap-10">
+        <div className="flex flex-col md:flex-row justify-between gap-10 shadow-lg">
             {data && data.blog && (
                 <>
                     {/* Soft Fade-In with Slide-Up for Main Content */}
@@ -57,12 +57,12 @@ const BlogDetails = () => {
 
                         {/* Soft Fade-In with Subtle Zoom Effect for the Image */}
                         <motion.div
-                            className="my-5"
+                            className="my-5 rounded-lg h-[500px] overflow-hidden"
                             initial={{ opacity: 0, scale: 0.95 }} // Start small and invisible
                             animate={{ opacity: 1, scale: 1 }} // Fade in and zoom up to full size
                             transition={{ duration: 1.2, ease: "easeOut" }}
                         >
-                            <img className="rounded w-full" src={data.blog.featuredImage} alt={data.blog.title} />
+                            <img draggable="false" className="rounded-lg w-full h-full shadow-lg object-contain" src={data.blog.featuredImage} alt={data.blog.title} />
                         </motion.div>
 
                         {/* Content Fade-In with Slight Scale-Up */}
@@ -88,7 +88,7 @@ const BlogDetails = () => {
 
             {/* Related Blogs Section: Fade-In with Delay */}
             <motion.div
-                className="border rounded w-full md:w-[30%] mt-5 md:mt-0"
+                className="border rounded w-full md:w-[30%] mt-5 md:mt-0 shadow-lg"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.2 }} // Delay to stagger animation

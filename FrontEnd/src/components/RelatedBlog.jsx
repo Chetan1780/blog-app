@@ -22,7 +22,7 @@ const RelatedBlog = ({props}) => {
                     return (
                         <Link key={blog._id} to={RouteBlogDetails(props.category,blog.slug)} >
                         <div  className='flex flex-col lg:flex-row  items-center gap-4 p-3 border-b border-gray-200'>
-                            <img className='w-[120px] rounded-md h-[90px] object-cover' src={blog.featuredImage} alt={blog.title} />
+                            <img draggable="false" className='w-[120px] rounded-md h-[90px] object-cover' src={blog.featuredImage} alt={blog.title} />
                             <h4 className='text-base font-semibold text-gray-700 line-clamp-2'>{blog.title}</h4>
                         </div>
                         </Link>

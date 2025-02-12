@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';  // Import motion
+import { motion } from 'framer-motion';  
 import BlogCard from '@/components/BlogCard';
 import Loading from '@/components/Loading';
 import { getEnv } from '@/Helper/getEnv';
@@ -19,13 +19,13 @@ const Index = () => {
         blogData.blog.map((blog, index) => (
           <motion.div
             key={blog._id}
-            initial={{ opacity: 0, y: 50 }}  // Start position off-screen with 0 opacity
-            animate={{ opacity: 1, y: 0 }}   // End position is fully visible
+            initial={{ opacity: 0, y: 50 }}  
+            animate={{ opacity: 1, y: 0 }}   
             transition={{
-              delay: index * 0.1,  // Stagger the animation slightly for each card
-              type: 'spring',     // Type of animation, you can change this to 'tween' or 'spring'
-              stiffness: 80,     // Controls the speed of the spring animation
-              damping: 30,        // Controls the bounciness of the spring
+              delay: index * 0.1,  
+              type: 'spring',    
+              stiffness: 80,     
+              damping: 30,       
             }}
           >
             <BlogCard props={blog} />
