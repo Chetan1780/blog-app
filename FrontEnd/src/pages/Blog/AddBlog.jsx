@@ -172,7 +172,7 @@ const AddBlog = () => {
                   {({ getRootProps, getInputProps }) => (
                     <div {...getRootProps()}>
                       <input {...getInputProps()} />
-                      <div className='flex justify-center items-center w-36 h-28 rounded-lg border-2 border-dashed'>
+                      <div className='flex justify-center items-center w-36 h-28 rounded-lg border-2 cursor-pointer border-dashed'>
                         {preview ? (
                           <img draggable="false" src={preview} alt="preview" />
                         ) : (
