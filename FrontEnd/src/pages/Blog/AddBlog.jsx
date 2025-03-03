@@ -61,9 +61,11 @@ const AddBlog = () => {
   
   const [preview, setPreview] = useState(null);
   const [file, setFile] = useState(null)
+  const [isSaving, setisSaving] = useState(false)
   const navigate = useNavigate();
   const onSubmit = async (data) => {
     // console.log(data);
+    setisSaving(true)
     const newData = {...data,author:user.user._id};
     const formData = new FormData();
     formData.append('file',file)
@@ -85,6 +87,8 @@ const AddBlog = () => {
         showToast('success', temp.message);
     } catch (err) {
         showToast('error', err.message);
+    } finally{
+      setisSaving(true)
     }
    
   };
@@ -204,7 +208,7 @@ const AddBlog = () => {
               </div>
 
               <Button type="submit" className="w-full py-3">
-                Save
+                {isSaving?Saving:Save}
               </Button>
             </form>
           </Form>
