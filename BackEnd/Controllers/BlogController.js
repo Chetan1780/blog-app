@@ -104,7 +104,7 @@ export const updateBlog = async (req, res, next) => {
         blog.content = encode(data.content);
         
         // Regenerate summary
-        blog.summary = (await summarize(data.content, "summarize")).join(" ");
+        // blog.summary = (await summarize(data.content, "summarize")).join(" ");
         
         await blog.save();
         res.status(200).json({ success: true, message: "Updated Successfully!!" });
@@ -113,20 +113,20 @@ export const updateBlog = async (req, res, next) => {
     }
 };
 
-export const regenerateSummary = async (req, res, next) => {
-    try {
-        const { blogid } = req.params;
-        const blog = await Blog.findById(blogid);
-        if (!blog) return next(handleError(404, "Blog not found"));
+// export const regenerateSummary = async (req, res, next) => {
+//     try {
+//         const { blogid } = req.params;
+//         const blog = await Blog.findById(blogid);
+//         if (!blog) return next(handleError(404, "Blog not found"));
         
-        blog.summary = (await summarize(blog.content, "summarize")).join(" ");
-        await blog.save();
+//         blog.summary = (await summarize(blog.content, "summarize")).join(" ");
+//         await blog.save();
         
-        res.status(200).json({ success: true, summary: blog.summary });
-    } catch (error) {
-        next(handleError(500, error.message));
-    }
-};
+//         res.status(200).json({ success: true, summary: blog.summary });
+//     } catch (error) {
+//         next(handleError(500, error.message));
+//     }
+// };
 
 export const getBlog = async (req, res, next) => {
     try {
