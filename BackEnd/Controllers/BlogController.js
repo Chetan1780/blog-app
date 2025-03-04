@@ -3,8 +3,6 @@ import cloudinary from '../Config/cloudinary.js';
 import { handleError } from '../Helper/handleError.js';
 import Blog from '../models/BlogModel.js';
 import { encode } from 'entities';
-import { summarize } from '../Config/Summarizer.js';
-
 export const addBlog = async (req, res, next) => {
     try {
         const data = JSON.parse(req.body.data);
@@ -15,20 +13,14 @@ export const addBlog = async (req, res, next) => {
                 resource_type: 'auto'
             }).catch(error => next(handleError(500, error.message)));
             temp = uploadResult.secure_url;
-        }
-        
-        // Generate AI Summary
-        const summaryChunks = await summarize(data.content, "summarize");
-        const summary = summaryChunks.join(" ");
-        
+        }    
         const blog = new Blog({
             author: data.author,
             category: data.category,
             slug:data.slug,
             title: data.title,
             featuredImage: temp,
-            content: encode(data.content),
-            summary 
+            content: encode(data.content)
         });
         await blog.save();
         res.status(200).json({ success: true, message: "Added Successfully!!" });
