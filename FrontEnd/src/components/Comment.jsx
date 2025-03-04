@@ -23,7 +23,7 @@ const Comment = ({ props }) => {
     const formSchema = z.object({
         comment: z.string().min(1, 'Comment must be at least 1 characters long!!'),
     });
-
+    const [isSubmit, setisSubmit] = useState(false);
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -32,6 +32,7 @@ const Comment = ({ props }) => {
     });
     const onSubmit = async (data) => {
         const newData = {...data,blogid:props.blogid,user:user.user._id};
+        setisSubmit(true);
         try {
             const resp = await fetch(`${getEnv('VITE_API_BACKEND_URL')}/comment/add`, {
                 method: 'POST',
@@ -49,6 +50,8 @@ const Comment = ({ props }) => {
             showToast('success', temp.message);
         } catch (err) {
             showToast('error', err.message);
+        } finally{
+            setisSubmit(false);
         }
     };
     return (
@@ -71,7 +74,7 @@ const Comment = ({ props }) => {
                             )}
                         />
                         <Button type="submit" className="w-full py-3">
-                            Submit
+                            {isSubmit?"Submiting":"Submit"}
                         </Button>
                     </form>
                 </Form> : <Button>
