@@ -208,7 +208,7 @@ const AddBlog = () => {
               </div>
 
               <Button type="submit" className="w-full py-3">
-                {isSaving?Saving:Save}
+                {isSaving?"Saving":"Save"}
               </Button>
             </form>
           </Form>
