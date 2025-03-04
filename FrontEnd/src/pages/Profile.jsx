@@ -54,11 +54,13 @@ const Profile = () => {
             })
         }
     }, [userData])
+    const [isSaving, setisSaving] = useState(false)
     const onSubmit = async (data) => {
         // console.log(data);
         const formData = new FormData();
         formData.append('file',file)
         formData.append('data',JSON.stringify(data));
+        setisSaving(true)
         try {
             const resp = await fetch(`${getEnv('VITE_API_BACKEND_URL')}/user/update-user/${userData.user._id}`, {
                 method: 'PUT',
@@ -73,6 +75,8 @@ const Profile = () => {
             showToast('success', temp.message);
         } catch (err) {
             showToast('error', err.message);
+        } finally{
+            setisSaving(false);
         }
     };
     const handleImage = (files)=>{
@@ -172,7 +176,7 @@ const Profile = () => {
                             />
 
                             <Button type="submit" className="w-full py-3">
-                                Save Changes
+                                {isSaving?"Saving":"Save Changes"}
                             </Button>
                         </form>
                     </Form>

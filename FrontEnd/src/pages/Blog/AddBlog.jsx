@@ -88,7 +88,7 @@ const AddBlog = () => {
     } catch (err) {
         showToast('error', err.message);
     } finally{
-      setisSaving(true)
+      setisSaving(false)
     }
    
   };
