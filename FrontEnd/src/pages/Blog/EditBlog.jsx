@@ -76,6 +76,7 @@ const EditBlog = () => {
 
   }, [form.watch('title')])
   
+  const [isSaving, setisSaving] = useState(false);
   const [preview, setPreview] = useState(null);
   const [file, setFile] = useState(null)
   const navigate = useNavigate();
@@ -84,6 +85,7 @@ const EditBlog = () => {
     const formData = new FormData();
     formData.append('file',file)
     formData.append('data',JSON.stringify(data));
+    setisSaving(true);
     try {
         const resp = await fetch(`${getEnv('VITE_API_BACKEND_URL')}/blog/update/${blog_id}`, {
             method: 'PUT',
@@ -101,6 +103,8 @@ const EditBlog = () => {
         showToast('success', temp.message);
     } catch (err) {
         showToast('error', err.message);
+    } finally{
+      setisSaving(false);
     }
    
   };
@@ -220,7 +224,7 @@ const EditBlog = () => {
               </div>
 
               <Button type="submit" className="w-full py-3">
-                Save
+                {isSaving?"Saving":"Save"}
               </Button>
             </form>
           </Form>
