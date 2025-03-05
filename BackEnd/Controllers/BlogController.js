@@ -172,11 +172,8 @@ export const search = async (req,res,next)=>{
     try {
         const {q} = req.query;
         let blog;
-        if(q==null){
-            blog = blog = await Blog.find().populate('author','name avatar role ').populate('category','name slug').sort({createdAt:-1}).lean().exec();
-        } else{
-            blog = await Blog.find({ title:{$regex:q,$options:'i'}}).populate('author','name avatar role ').populate('category','name slug').sort({createdAt:-1}).lean().exec();
-        }
+        console.log(q);
+        blog = await Blog.find({ title:{$regex:q,$options:'i'}}).populate('author','name avatar role ').populate('category','name slug').sort({createdAt:-1}).lean().exec();
         res.status(200).json({
             blog,
         })

@@ -2,34 +2,49 @@ import BlogCard from '@/components/BlogCard';
 import Loading from '@/components/Loading';
 import { getEnv } from '@/Helper/getEnv';
 import { usefetch } from '@/hooks/usefetch';
-import React from 'react'
-import { useSearchParams } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { IoMdSearch } from "react-icons/io";
+import { debounce } from 'lodash';
 
 const SearchResult = () => {
-const [searchParams] = useSearchParams();
-const q = searchParams.get('q')
-const { data: blogData, loading, error } = usefetch(`${getEnv('VITE_API_BACKEND_URL')}/blog/search?q=${q}`, {
-    method: 'get',
-    credentials: 'include'
-},[q]);
-if(loading) return <Loading/>
+  const [searchParams] = useSearchParams();
+  const [query, setQuery] = useState(searchParams.get('q') || '');
+  const [debouncedQuery, setDebouncedQuery] = useState(query);
+  useEffect(() => {
+    const handler = debounce(() => {
+      setDebouncedQuery(query);
+    }, 300); 
+
+    handler();
+    return () => handler.cancel();
+  }, [query]);
+
+  useEffect(() => {
+    setQuery(searchParams.get('q') || '');
+  }, [searchParams]);
+
+  const { data: blogData, loading, error } = usefetch(
+    `${getEnv('VITE_API_BACKEND_URL')}/blog/search?q=${debouncedQuery}`,
+    { method: 'get', credentials: 'include' },
+    [debouncedQuery]
+  );
+
   return (
     <>
-    <div className='flex items-center gap-2 text-xs md:text-2xl text-purple-600 font-semibold pb-3'>
-    <IoMdSearch />
-    <h4 className=''>{`Search Result For: ${q}`}</h4>
-    </div>
-    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10'>
-      {blogData && blogData.blog.length>0?
-      blogData.blog.map(blog=>{
-        return <BlogCard key={blog._id} props={blog} />
-      }):
-      <div>Data Not Found!!!</div>
-      }
-    </div>
+      {loading ? (
+        <Loading />
+      ) : (
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10'>
+          {blogData && blogData.blog.length > 0 ? (
+            blogData.blog.map(blog => <BlogCard key={blog._id} props={blog} />)
+          ) : (
+            <div>Data Not Found!!!</div>
+          )}
+        </div>
+      )}
     </>
-  )
-}
+  );
+};
 
-export default SearchResult
+export default SearchResult;
