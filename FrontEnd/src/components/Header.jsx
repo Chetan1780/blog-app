@@ -68,12 +68,13 @@ const Header = () => {
       <div className='flex items-center gap-2 sm:gap-3 md:gap-4'>
         <DarkModeToggle className="h-6 w-6 sm:h-7 sm:w-7" />
         {!user.isLoggedIn ? (
-          <Button className="rounded-xl flex items-center px-3 py-1 sm:px-4 sm:py-2 text-sm sm:text-base">
-            <Link to={RouteLogin} className="flex items-center gap-1 font-bold">
+          <Link to={RouteLogin} className="flex items-center font-bold">
+          <Button className="rounded-xl flex items-center px-3 py-1 sm:px-1 sm:py-2 text-sm sm:text-base">
+            
               <MdLogin size={18} />
               <span>Sign-In</span>
-            </Link>
           </Button>
+            </Link>
         ) : (
           <DropdownMenu>
             <DropdownMenuTrigger>

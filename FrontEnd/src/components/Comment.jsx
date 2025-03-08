@@ -94,9 +94,10 @@ const Comment = ({ props }) => {
                     </form>
                 </Form>
             ) : (
+                <Link to={RouteLogin}>
                 <Button className="w-full dark:bg-purple-700 dark:hover:bg-purple-800 dark:text-white">
-                    <Link to={RouteLogin}>Login to Comment</Link>
-                </Button>
+                    Login to Comment
+                </Button></Link>
             )}
         </motion.div>
     );
