@@ -21,10 +21,10 @@ const DarkModeToggle = () => {
   return (
     <button
       onClick={() => setDarkMode(!darkMode)}
-      className='p-2 bg-gray-200 dark:bg-gray-800 text-black dark:text-white rounded flex items-center gap-2'
+      className='p-2 sm:p-2.5 bg-gray-200 dark:bg-gray-800 text-black dark:text-white rounded flex items-center gap-1 sm:gap-2 text-sm sm:text-base'
     >
-      {darkMode ? <Sun size={18} /> : <Moon size={18} />}
-      {darkMode ? 'Light Mode' : 'Dark Mode'}
+      {darkMode ? <Sun size={16} /> : <Moon size={16} />}
+      <span className="hidden sm:inline">{darkMode ? 'Light Mode' : 'Dark Mode'}</span>
     </button>
   )
 }

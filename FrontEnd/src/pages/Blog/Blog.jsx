@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import {
     Table,
     TableBody,
-    TableCaption,
     TableCell,
     TableHead,
     TableHeader,
@@ -20,6 +19,7 @@ import { MdDelete } from 'react-icons/md';
 import moment from 'moment/moment';
 import { deletedata } from '@/Helper/HandleDelete';
 import { showToast } from '@/Helper/ShowToast';
+import { motion } from 'framer-motion';
 
 const Blog = () => {
     const [referesh, setRefreshData] = useState(false);
@@ -42,10 +42,16 @@ const Blog = () => {
     if (error) return <div className="text-red-500">Error: {error.message}</div>;
 
     return (
-        <div className="p-4 flex flex-col gap-2">
-             <Button asChild className="dark:bg-purple-700dark:hover:bg-purple-800 dark:text-white">
-                        <Link to={RouteBlogAdd}>Add a New Blog</Link>
-                    </Button>
+        <motion.div
+            className="p-4 flex flex-col gap-2"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
+        >
+            <Button asChild className="dark:bg-purple-700 dark:hover:bg-purple-800 dark:text-white">
+                <Link to={RouteBlogAdd}>Add a New Blog</Link>
+            </Button>
+            
             <Card className="bg-white dark:bg-gray-900 dark:text-white shadow-lg">
                 <CardHeader className="flex justify-between items-center p-4">
                     <h2 className="text-lg font-semibold dark:text-gray-300">Your Blogs</h2>
@@ -91,9 +97,8 @@ const Blog = () => {
                         </TableBody>
                     </Table>
                 </CardContent>
-                
             </Card>
-        </div>
+        </motion.div>
     );
 }
 

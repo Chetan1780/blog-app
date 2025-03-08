@@ -65,7 +65,7 @@ const Comment = ({ props }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, ease: "easeOut" }}
         >
-            <h4 className="flex items-center gap-2 text-2xl font-bold dark:text-white">
+            <h4 className="flex items-center gap-2 text-2xl pb-2 font-bold dark:text-white">
                 <MdModeComment className="text-purple-700" /> Comment
             </h4>
 

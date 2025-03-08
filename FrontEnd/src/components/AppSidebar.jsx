@@ -27,7 +27,7 @@ import {
 import { usefetch } from "@/hooks/usefetch";
 import { getEnv } from "@/Helper/getEnv";
 import { useSelector } from "react-redux";
-
+import Logo from "../components/Logo"
 const AppSidebar = () => {
   const { data: categoryData, loading, error } = usefetch(
     `${getEnv("VITE_API_BACKEND_URL")}/category/all-category`,
@@ -40,8 +40,8 @@ const AppSidebar = () => {
   return (
     <Sidebar className="bg-gray-100 dark:bg-gray-900 text-black dark:text-white">
       {/* Header with Logo */}
-      <SidebarHeader className="bg-white dark:bg-gray-900 p-4 flex justify-center">
-        <img draggable="false" src={logo} width={120} alt="Logo" />
+      <SidebarHeader className="bg-white dark:bg-gray-900 p-4 flex justify-center items-start">
+        <Logo/>
       </SidebarHeader>
 
       {/* Sidebar Content */}
