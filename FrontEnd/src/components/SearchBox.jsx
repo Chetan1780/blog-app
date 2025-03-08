@@ -31,8 +31,10 @@ const SearchBox = () => {
       <Input
         name="query"
         value={query}
-        onChange={handleInputChange} // Only update on user input
-        className="h-10 rounded-2xl mx-auto text-xs bg-gray-50 md:text-xl font-semibold p-2 w-1/2 md:w-full"
+        onChange={handleInputChange}
+        className="h-10 rounded-2xl mx-auto text-xs md:text-xl font-semibold p-2 w-1/2 md:w-full 
+                   bg-gray-50 dark:bg-gray-800 dark:text-white 
+                   focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
         placeholder="Search here...."
       />
     </form>

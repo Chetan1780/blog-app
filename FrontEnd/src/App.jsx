@@ -19,6 +19,7 @@ import Comments from './pages/Comments'
 import Users from './pages/Users'
 import AuthRouteProt from './components/AuthRouteProt'
 import AuthRouteprotadmin from './components/AuthRouteprotadmin'
+// import "./App.css"
 const App = () => {
   return (
     <BrowserRouter>

@@ -103,10 +103,10 @@ const AddBlog = () => {
   if (loading) return <Loading />
   // console.log(categoryData);
   return (
-    <div>
-      <Card className='pt-5 max-w-screen-xl mx-auto'>
-      <h1 className='text-2xl font-bold mb-4 mx-8' >Add Blog</h1>
-
+    <div className="dark:bg-gray-900 dark:text-white min-h-screen">
+      <Card className="pt-5 max-w-screen-xl mx-auto dark:bg-gray-800 dark:border-gray-700">
+        <h1 className="text-2xl font-bold mb-4 mx-8 dark:text-white">Add Blog</h1>
+  
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -115,36 +115,43 @@ const AddBlog = () => {
                 name="category"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category</FormLabel>
+                    <FormLabel className="dark:text-gray-300">Category</FormLabel>
                     <FormControl>
-                      <Select onValueChange={field.onChange} defaultValue={field.defaultValue}>
-                        <SelectTrigger className="">
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.defaultValue}
+                      >
+                        <SelectTrigger className="dark:border-gray-600 dark:bg-gray-800 dark:text-white">
                           <SelectValue placeholder="Category" />
                         </SelectTrigger>
-                        <SelectContent>
-                          {categoryData && categoryData.category.length > 0 &&
-                            categoryData.category.map(item => {
-                              return <SelectItem key={item._id} value={item._id}>{item.name}</SelectItem>
-                            })
-                          }
+                        <SelectContent className="dark:bg-gray-800 dark:text-white">
+                          {categoryData?.category?.map(item => (
+                            <SelectItem
+                              key={item._id}
+                              value={item._id}
+                              className="dark:hover:bg-gray-700"
+                            >
+                              {item.name}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
-
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+  
               <FormField
                 control={form.control}
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Title</FormLabel>
+                    <FormLabel className="dark:text-gray-300">Title</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Title"
-                        className="w-full bg-transparent outline-none p-3 border rounded-lg"
+                        className="w-full bg-transparent outline-none p-3 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                         {...field}
                       />
                     </FormControl>
@@ -152,17 +159,17 @@ const AddBlog = () => {
                   </FormItem>
                 )}
               />
-
+  
               <FormField
                 control={form.control}
                 name="slug"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Slug</FormLabel>
+                    <FormLabel className="dark:text-gray-300">Slug</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Slug"
-                        className="w-full bg-transparent outline-none p-3 border rounded-lg"
+                        className="w-full bg-transparent outline-none p-3 border rounded-lg dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                         {...field}
                       />
                     </FormControl>
@@ -170,53 +177,55 @@ const AddBlog = () => {
                   </FormItem>
                 )}
               />
-              <div className='space-y-2'>
-                <span>Featured Image</span>
-                <Dropzone onDrop={acceptedFiles => handleImage(acceptedFiles)}>
-                  {({ getRootProps, getInputProps }) => (
-                    <div {...getRootProps()}>
-                      <input {...getInputProps()} />
-                      <div className='flex justify-center items-center w-36 h-28 rounded-lg border-2 cursor-pointer border-dashed'>
-                        {preview ? (
-                          <img draggable="false" src={preview} alt="preview" />
-                        ) : (
-                          <IoCameraOutline size={24} />
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </Dropzone>
-              </div>
-              <div>
-                <FormField
-                  control={form.control}
-                  name="content"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Blog Content</FormLabel>
-                      <FormControl>
-                        <Editor
-                          initialData=""
-                          onChange={handleEditorData}  // Pass onChange directly as a prop
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+  
+  <div className="space-y-2">
+  <span className="dark:text-gray-300">Featured Image</span>
+  <Dropzone onDrop={acceptedFiles => handleImage(acceptedFiles)}>
+    {({ getRootProps, getInputProps }) => (
+      <div className="flex items-center gap-4">
+        {/* Clickable Dropzone Box */}
+        <div {...getRootProps()} className="w-36 h-28 p-2 rounded-lg border-2 cursor-pointer border-dashed dark:border-gray-600 flex justify-center items-center">
+          <input {...getInputProps()} />
+          {preview ? (
+            <img draggable="false" src={preview} alt="preview" className="w-full h-full object-cover rounded-lg" />
+          ) : (
+            <IoCameraOutline size={24} className="dark:text-gray-300" />
+          )}
+        </div>
+      </div>
+    )}
+  </Dropzone>
+</div>
 
-              </div>
-
-              <Button type="submit" className="w-full py-3">
-                {isSaving?"Saving":"Save"}
+  
+              <FormField
+                control={form.control}
+                name="content"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="dark:text-gray-300">Blog Content</FormLabel>
+                    <FormControl>
+                      <Editor
+                        initialData=""
+                        onChange={handleEditorData}
+                        className="dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+  
+              <Button type="submit" className="w-full py-3 dark:bg-gray-700 dark:hover:bg-gray-600">
+                {isSaving ? "Saving" : "Save"}
               </Button>
             </form>
           </Form>
         </CardContent>
       </Card>
     </div>
-
-  )
+  );
+  
 }
 
 export default AddBlog
