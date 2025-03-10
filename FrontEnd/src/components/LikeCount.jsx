@@ -14,14 +14,38 @@ const LikeCount = ({ props }) => {
   const [liked, setLiked] = useState(false);
   const [animate, setAnimate] = useState(false);
 
-  // Fetch likes data
   const { data } = usefetch(
     `${getEnv('VITE_API_BACKEND_URL')}/like/get-like/${props.blogid}${userId ? `/${userId}` : ''}`,
     { method: 'get', credentials: 'include' },
     [props.blogid, userId]
   );
 
-  // Update state when data is fetched
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          `${getEnv('VITE_API_BACKEND_URL')}/like/get-like/${props.blogid}${userId ? `/${userId}` : ''}`,
+          { method: 'get', credentials: 'include' }
+        );
+
+        const newData = await response.json();
+        if (response.ok) {
+          setLikeCount(newData.countLike);
+          setLiked(newData.isLikedByUser);
+        } else {
+          showToast('error', newData.message);
+        }
+      } catch (error) {
+        showToast('error', 'Error fetching like data.');
+      }
+    };
+
+    fetchData();
+    const interval = setInterval(fetchData, 45000);
+
+    return () => clearInterval(interval);
+  }, [props.blogid, userId]);
+
   useEffect(() => {
     if (data) {
       setLikeCount(data.countLike);
@@ -29,7 +53,6 @@ const LikeCount = ({ props }) => {
     }
   }, [data]);
 
-  // Debounced API call (waits 500ms before updating backend)
   const updateLikeInBackend = useCallback(
     debounce(async (newLikedState) => {
       try {

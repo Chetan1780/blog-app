@@ -1,22 +1,49 @@
 import { getEnv } from '@/Helper/getEnv';
-import { usefetch } from '@/hooks/usefetch';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Avatar, AvatarImage } from './ui/avatar';
 import usericon from '@/assets/Images/user.png';
-import moment from 'moment/moment';
+import moment from 'moment';
 import { motion } from 'framer-motion';
 
 const CommentList = ({ props }) => {
-    const { data, loading, error } = usefetch(
-        `${getEnv('VITE_API_BACKEND_URL')}/comment/get-comments/${props.blogid}`,
-        {
-            method: 'get',
-            credentials: 'include'
-        },
-        [props.refresh]
-    );
+    const [comments, setComments] = useState([]); // 🔥 Fixed: Now stores actual comments
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const fetchComments = async () => {
+        try {
+            const resp = await fetch(
+                `${getEnv('VITE_API_BACKEND_URL')}/comment/get-comments/${props.blogid}`,
+                { method: 'GET', credentials: 'include' }
+            );
+            const temp = await resp.json();
+    
+            if (resp.ok) {
+                
+                setComments(temp.comments)
+                setLoading(false);
+            } else {
+                setComments([]); 
+                setError(temp.message);
+                setLoading(false);
+            }
+        } catch (error) {
+            setComments([]);
+            setError("Error fetching comment list");
+            setLoading(false);
+        }
+    };
+    
+    useEffect(() => {
+        fetchComments();
+
+        const interval = setInterval(fetchComments, 300000); 
+
+        return () => clearInterval(interval);
+    }, [props.blogid, props.refresh]);
 
     if (loading) return <div className="text-gray-500 dark:text-gray-400">Loading comments...</div>;
+    // if (error) return <div className="text-red-500">{error}</div>; // 🔥 Show error message if fetching fails
 
     return (
         <motion.div
@@ -26,12 +53,12 @@ const CommentList = ({ props }) => {
             transition={{ duration: 1.2, ease: "easeOut" }}
         >
             <h3 className="text-xl font-bold dark:text-white">
-                <span className="text-purple-700">{data && data.comments.length}</span> Comments
+                <span className="text-purple-700">{comments.length}</span> Comments
             </h3>
 
             <div className="mt-5">
-                {data && data.comments.length > 0 ? (
-                    data.comments.map(comment => (
+                {comments.length > 0 ? (
+                    comments.map(comment => (
                         <div key={comment._id} className="border-b dark:border-gray-700 pb-4 mb-4">
                             <div className="flex gap-4 items-start p-4 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm">
                                 <Avatar className="w-10 h-10 rounded-full shadow-md">
