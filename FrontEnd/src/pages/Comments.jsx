@@ -17,6 +17,8 @@ import { deletedata } from '@/Helper/HandleDelete';
 import { showToast } from '@/Helper/ShowToast';
 import moment from 'moment/moment';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { RouteBlogDetails } from '@/Helper/RouteName';
 
 const Comments = () => {
     const [refresh, setRefreshData] = useState(false);
@@ -25,6 +27,9 @@ const Comments = () => {
         { method: 'get', credentials: 'include' },
         [refresh]
     );
+    console.log(commentData);
+    
+    
 
     const handleDelete = async (id) => {
         const temp = await deletedata(`${getEnv('VITE_API_BACKEND_URL')}/comment/delete/${id}`);
@@ -62,7 +67,13 @@ const Comments = () => {
                             {commentData && commentData.comments.length > 0 ? (
                                 commentData.comments.map(comment => (
                                     <TableRow key={comment._id} className="hover:bg-gray-100 dark:hover:bg-gray-800">
-                                        <TableCell>{comment.blogid?.title}</TableCell>
+
+                                        {/* //Changes */}
+                                        {/* <Link to={RouteBlogDetails(props.category.slug, props.slug)}> */}
+
+                                        {/* <TableCell>{comment.blogid?.title}</TableCell> */}
+                                        <TableCell className="underline underline-offset-4"><Link to={RouteBlogDetails(comment.blogid?.category,comment.blogid?.slug)}>{comment.blogid?.title}</Link></TableCell>
+
                                         <TableCell>{comment.user?.name}</TableCell>
                                         <TableCell>{comment?.comment}</TableCell>
                                         <TableCell>{moment(comment.createdAt).format('DD-MM-YYYY')}</TableCell>

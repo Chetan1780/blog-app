@@ -52,10 +52,10 @@ export const getAllComments = async (req,res,next)=>{
         const blogs = await Blog.find({author:user._id});
         const blogIds = blogs.map(blog => blog._id);
         if(user && user.role==='admin'){
-            comments = await Comment.find().populate('blogid','title').populate('user','name').lean().exec();;
+            comments = await Comment.find().populate('blogid', 'title slug category').populate('user','name').lean().exec();;
         } else{
             comments = await Comment.find({ blogid: { $in: blogIds } })
-            .populate('blogid', 'title') 
+            .populate('blogid', 'title slug category') 
             .populate('user', 'name')   
             .lean()
             .exec();
