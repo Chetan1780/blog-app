@@ -5,7 +5,6 @@ export const like = async (req, res, next) => {
       const { userid, blogid } = req.body;
       let like;
   
-      // Check if the like exists
       like = await Likes.findOne({ userid, blogid });
   
       if (!like) {
@@ -18,17 +17,15 @@ export const like = async (req, res, next) => {
         await Likes.findByIdAndDelete(like._id);
       }
   
-      // Get the updated like count (and only send simple data)
       const countLike = await Likes.countDocuments({ blogid });
   
-      // Return only the necessary data in the response
       res.status(200).json({
         success: true,
         countLike
       });
   
     } catch (error) {
-      next(handleError(500, error.message)); // Handle error if needed
+      next(handleError(500, error.message));
     }
   };
   
