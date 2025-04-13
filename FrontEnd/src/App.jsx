@@ -19,38 +19,43 @@ import Comments from './pages/Comments'
 import Users from './pages/Users'
 import AuthRouteProt from './components/AuthRouteProt'
 import AuthRouteprotadmin from './components/AuthRouteprotadmin'
+import PublicRoute from './components/PublicRoute'
 // import "./App.css"
 const App = () => {
   return (
     <BrowserRouter>
-    <Routes>
-      <Route path={RouteIndex} element={<Layout/>}>
-          <Route index element={<Index/>}/>
-          
+      <Routes>
+        <Route path={RouteIndex} element={<Layout />}>
+          <Route index element={<Index />} />
 
 
-          <Route path={RouteBlogDetails()} element={<BlogDetails/>} />
-          <Route path={RouteBlogByCategory()} element={<BlogByCategory/>} />
-          <Route path={RouteSearch()} element={<SearchResult/>} />
 
-          <Route element={<AuthRouteProt/>}>
-            <Route path={RouteBlog} element={<Blog/>} />
-            <Route path={RouteProfile} element={<Profile/>} />
-            <Route path={RouteEditBlog()} element={<EditBlog/>} />
-            <Route path={RouteBlogAdd} element={<AddBlog/>} />
-            <Route path={RouteComments} element={<Comments/>} />
+          <Route path={RouteBlogDetails()} element={<BlogDetails />} />
+          <Route path={RouteBlogByCategory()} element={<BlogByCategory />} />
+          <Route path={RouteSearch()} element={<SearchResult />} />
+
+          <Route element={<AuthRouteProt />}>
+            <Route path={RouteBlog} element={<Blog />} />
+            <Route path={RouteProfile} element={<Profile />} />
+            <Route path={RouteEditBlog()} element={<EditBlog />} />
+            <Route path={RouteBlogAdd} element={<AddBlog />} />
+            <Route path={RouteComments} element={<Comments />} />
           </Route>
-          <Route element={<AuthRouteprotadmin/>}>
-            <Route path={RouteUsers} element={<Users/>} />
-            <Route path={RouteAddCategory} element={<AddCategory/>} />
-            <Route path={RouteCategoryDetails} element={<CategoryDetails/>} />
-            <Route path={RouteEditCategory()} element={<EditCategory/>} />
+          <Route element={<AuthRouteprotadmin />}>
+            <Route path={RouteUsers} element={<Users />} />
+            <Route path={RouteAddCategory} element={<AddCategory />} />
+            <Route path={RouteCategoryDetails} element={<CategoryDetails />} />
+            <Route path={RouteEditCategory()} element={<EditCategory />} />
 
           </Route>
-      </Route>
-      <Route path={RouteLogin} element={<Login/>}/>
-      <Route path={RouteRegister} element={<Register/>}/>
-    </Routes>
+        </Route>
+
+        <Route path={RouteLogin} element={<PublicRoute>
+          <Login />
+        </PublicRoute>} />
+        <Route path={RouteRegister} element={<PublicRoute>
+          <Register /></PublicRoute>} />
+      </Routes>
     </BrowserRouter>
   )
 }
