@@ -28,9 +28,9 @@
 ## 🖼️ Screenshots
 
 <p align="center">
-  <img src="[screenshots/homepage.png](https://github.com/user-attachments/assets/ab1bf913-7ce6-4905-873c-60f9a74ccc4c)" width="80%" alt="Home Page" />
+  <img src="[Screenshot/homepage.png](https://github.com/user-attachments/assets/ab1bf913-7ce6-4905-873c-60f9a74ccc4c)" width="80%" alt="Home Page" />
   <br/>
-  <img src="screenshots/BlogPage.png" width="80%" alt="Editor" />
+  <img src="Screenshot/BlogPage.png" width="80%" alt="Editor" />
   <br/>
 <!--   <img src="screenshots/dashboard.png" width="80%" alt="Dashboard" /> -->
 </p>
