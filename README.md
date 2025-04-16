@@ -58,13 +58,12 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/Chetan1780/blogify.git
-cd blogify
+git clone https://github.com/Chetan1780/blog-app.git
+cd blog-app
 
 # Install backend dependencies
 cd BackEnd
 npm install
-cp .env.example .env # Fill in credentials
 
 # Install frontend dependencies
 cd ../FrontEnd
