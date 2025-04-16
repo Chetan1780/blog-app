@@ -28,11 +28,11 @@
 ## 🖼️ Screenshots
 
 <p align="center">
-  <img src="![Home Page](Screenshot/homepage.png)" width="60%" alt="Home Page" />
+  <img src="Screenshot/homepage.png" width="60%" alt="Home Page" />
   <br/>
-  <img src="![Blog Page](Screenshot/BlogPage.png)" width="60%" alt="Editor" />
+  <img src="Screenshot/BlogPage.png" width="60%" alt="Blog Page" />
   <br/>
-<!--   <img src="screenshots/dashboard.png" width="80%" alt="Dashboard" /> -->
+  <!-- <img src="Screenshot/dashboard.png" width="80%" alt="Dashboard" /> -->
 </p>
 
 ---
