@@ -30,9 +30,9 @@
 <p align="center">
   <img src="screenshots/homepage.png" width="80%" alt="Home Page" />
   <br/>
-  <img src="screenshots/editor.png" width="80%" alt="Editor" />
+  <img src="screenshots/BlogPage.png" width="80%" alt="Editor" />
   <br/>
-  <img src="screenshots/dashboard.png" width="80%" alt="Dashboard" />
+<!--   <img src="screenshots/dashboard.png" width="80%" alt="Dashboard" /> -->
 </p>
 
 ---
@@ -42,13 +42,6 @@
 | Frontend | Backend | Database | Auth | Storage | Styling | Others |
 |----------|---------|----------|------|---------|---------|--------|
 | React, Redux Toolkit, React Router | Node.js, Express.js | MongoDB, Mongoose | JWT, Cookies | Cloudinary | Tailwind CSS, ShadCN, Framer Motion | Zod, React Hook Form, Toastify |
-
----
-
-## 📁 Folder Structure
-
-blogify/ ├── client/ # Frontend (React) │ ├── src/ │ ├── public/ ├── server/ # Backend (Node.js, Express) │ ├── controllers/ │ ├── models/ │ ├── routes/ │ ├── middleware/ │ ├── utils/ ├── .env ├── README.md
-
 
 ---
 
