@@ -30,7 +30,7 @@
 <p align="center">
   <img src="https://github.com/user-attachments/assets/ab1bf913-7ce6-4905-873c-60f9a74ccc4c" width="60%" alt="Home Page" />
   <br/>
-  <img src="https://github.com/user-attachments/assets/YOUR-BLOGPAGE-ID" width="60%" alt="Blog Page" />
+  <img src="https://github.com/user-attachments/assets/4793e69c-fb86-45ec-9578-c71c917aa6ff" width="60%" alt="Blog Page" />
   <br/>
   <!-- <img src="https://github.com/user-attachments/assets/YOUR-DASHBOARD-ID" width="80%" alt="Dashboard" /> -->
 </p>
