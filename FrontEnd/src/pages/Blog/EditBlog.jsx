@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Form,
   FormControl,
@@ -29,12 +30,10 @@ import Loading from "@/components/Loading";
 import Dropzone from "react-dropzone";
 import { IoCameraOutline } from "react-icons/io5";
 import Editor from "@/components/Editor";
-import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { decode } from "entities";
 
 const EditBlog = () => {
-  const user = useSelector((state) => state.persistedReducer.user);
   const { blog_id } = useParams();
   const { data: blogData, loading: blogLoading } = usefetch(
     `${getEnv("VITE_API_BACKEND_URL")}/blog/get-blog/${blog_id}`,
@@ -46,8 +45,13 @@ const EditBlog = () => {
     category: z.string().min(3, "Category must be at least 3 characters long!!"),
     slug: z.string().min(3, "Slug must be at least 3 characters long!!"),
     content: z.string().min(3, "Blog content must be at least 3 characters long!!"),
+    excerpt: z.string().max(320, "Keep the excerpt under 320 characters.").optional(),
+    tags: z.string().optional(),
+    status: z.enum(['draft', 'published']),
+    publishedAt: z.string().optional(),
+    featuredImageAlt: z.string().max(180, "Keep alt text under 180 characters.").optional(),
   });
-  const { data: categoryData, loading, error } = usefetch(
+  const { data: categoryData, loading } = usefetch(
     `${getEnv("VITE_API_BACKEND_URL")}/category/all-category`,
     { method: "get", credentials: "include" },
     []
@@ -55,7 +59,7 @@ const EditBlog = () => {
 
   const form = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: { title: "", category: "", slug: "", content: "" },
+    defaultValues: { title: "", category: "", slug: "", content: "", excerpt: "", tags: "", status: "draft", publishedAt: "", featuredImageAlt: "" },
   });
 
   useEffect(() => {
@@ -64,6 +68,11 @@ const EditBlog = () => {
       form.setValue("title", blogData.blog.title || "");
       form.setValue("slug", blogData.blog.slug || "");
       form.setValue("content", decode(blogData.blog.content || ""));
+      form.setValue("excerpt", blogData.blog.excerpt || "");
+      form.setValue("tags", blogData.blog.tags?.join(', ') || "");
+      form.setValue("status", blogData.blog.status || "published");
+      form.setValue("publishedAt", blogData.blog.publishedAt ? new Date(blogData.blog.publishedAt).toISOString().slice(0, 16) : "");
+      form.setValue("featuredImageAlt", blogData.blog.featuredImageAlt || blogData.blog.title || "");
       setPreview(blogData.blog.featuredImage || null);
     }
   }, [blogData]);
@@ -79,8 +88,12 @@ const EditBlog = () => {
 
   const onSubmit = async (data) => {
     const formData = new FormData();
-    formData.append("file", file);
-    formData.append("data", JSON.stringify(data));
+    const payload = {
+      ...data,
+      publishedAt: data.publishedAt ? new Date(data.publishedAt).toISOString() : '',
+    };
+    if (file) formData.append("file", file);
+    formData.append("data", JSON.stringify(payload));
     setisSaving(true);
     try {
       const resp = await fetch(`${getEnv("VITE_API_BACKEND_URL")}/blog/update/${blog_id}`, {
@@ -185,6 +198,69 @@ const EditBlog = () => {
                 )}
               />
 
+              <div className="grid gap-6 md:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-300">Publishing status</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            <SelectValue placeholder="Choose a status" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="draft">Save as draft</SelectItem>
+                          <SelectItem value="published">Publish now or schedule</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="publishedAt"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="dark:text-gray-300">Publish date (optional)</FormLabel>
+                      <FormControl>
+                        <Input type="datetime-local" disabled={form.watch('status') === 'draft'} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="excerpt"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="dark:text-gray-300">Excerpt</FormLabel>
+                    <FormControl><Textarea maxLength={320} placeholder="A concise summary for listings and sharing." {...field} /></FormControl>
+                    <p className="text-xs text-muted-foreground">{field.value?.length || 0}/320 characters</p>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="tags"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="dark:text-gray-300">Tags</FormLabel>
+                    <FormControl><Input placeholder="react, frontend, performance" {...field} /></FormControl>
+                    <p className="text-xs text-muted-foreground">Use up to 8 comma-separated tags.</p>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
 <div className="space-y-2">
   <span className="dark:text-gray-300">Featured Image</span>
   <Dropzone onDrop={handleImage}>
@@ -203,6 +279,18 @@ const EditBlog = () => {
     )}
   </Dropzone>
 </div>
+
+              <FormField
+                control={form.control}
+                name="featuredImageAlt"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="dark:text-gray-300">Featured image alt text</FormLabel>
+                    <FormControl><Input placeholder="Describe the image for readers using a screen reader" {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
 
               <FormField

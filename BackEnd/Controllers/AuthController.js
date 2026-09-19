@@ -1,116 +1,122 @@
-//register
-import {handleError} from "../Helper/handleError.js"
-import User from "../models/usermodel.js";
+import { handleError } from '../Helper/handleError.js';
+import { getFirebaseAuth } from '../Config/firebaseAdmin.js';
+import User from '../models/usermodel.js';
 import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-export const Register = async(req,res,next)=>{
-    try{
-        const {name,email,password} = req.body;
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            next(handleError(409,'User already registered!!'))
-        }
-        const hashedPassword = bcryptjs.hashSync(password);
-        const user = new User({
-            name,email,password:hashedPassword
-        });
-        await user.save();
-        res.status(200).json({
-            success:true,
-            message:'Registration successfull!!'
-        })
-    } catch(err){
-        next(handleError(500,err.message));
+import { z } from 'zod';
+
+const registerSchema = z.object({
+  name: z.string().trim().min(3).max(80),
+  email: z.string().trim().email().max(254),
+  password: z.string().min(8).max(128),
+});
+
+const loginSchema = z.object({
+  email: z.string().trim().email().max(254),
+  password: z.string().min(1).max(128),
+});
+
+const googleSchema = z.object({ idToken: z.string().min(20).max(20_000) });
+
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+  path: '/',
+  maxAge: 24 * 60 * 60 * 1000,
+};
+
+const publicUser = (user) => {
+  const data = user.toObject ? user.toObject() : user;
+  const { password, ...safeUser } = data;
+  return safeUser;
+};
+
+const validationError = (result, next) => next(handleError(400, result.error.issues[0].message));
+
+const createSession = (res, user) => {
+  const token = jwt.sign({ sub: String(user._id) }, process.env.JWT_SECRET, {
+    expiresIn: '1d',
+    issuer: process.env.JWT_ISSUER || 'blog-api',
+    audience: process.env.JWT_AUDIENCE || 'blog-web',
+  });
+  res.cookie('access_token', token, cookieOptions);
+};
+
+export const Register = async (req, res, next) => {
+  try {
+    const result = registerSchema.safeParse(req.body);
+    if (!result.success) return validationError(result, next);
+    const { name, password } = result.data;
+    const email = result.data.email.toLowerCase();
+    const existingUser = await User.findOne({ email }).select('_id');
+    if (existingUser) return next(handleError(409, 'An account already exists for this email.'));
+
+    const hashedPassword = await bcryptjs.hash(password, 12);
+    await User.create({ name, email, password: hashedPassword });
+    res.status(201).json({ success: true, message: 'Registration successful. Please sign in.' });
+  } catch (error) {
+    next(handleError(500, error.message));
+  }
+};
+
+export const Login = async (req, res, next) => {
+  try {
+    const result = loginSchema.safeParse(req.body);
+    if (!result.success) return validationError(result, next);
+    const email = result.data.email.toLowerCase();
+    const user = await User.findOne({ email }).select('+password');
+    if (!user || user.status !== 'active') return next(handleError(401, 'Invalid email or password.'));
+
+    const passwordMatches = await bcryptjs.compare(result.data.password, user.password);
+    if (!passwordMatches) return next(handleError(401, 'Invalid email or password.'));
+
+    user.lastLoginAt = new Date();
+    await user.save();
+    createSession(res, user);
+    res.status(200).json({ success: true, user: publicUser(user), message: 'Signed in successfully.' });
+  } catch (error) {
+    next(handleError(500, error.message));
+  }
+};
+
+export const GoogleLogin = async (req, res, next) => {
+  try {
+    const result = googleSchema.safeParse(req.body);
+    if (!result.success) return validationError(result, next);
+
+    const decodedToken = await getFirebaseAuth().verifyIdToken(result.data.idToken, true);
+    if (!decodedToken.email || !decodedToken.email_verified) {
+      return next(handleError(401, 'Your Google account must have a verified email address.'));
     }
-}
-//login
-export const Login = async(req,res,next)=>{  
-    try {
-        const {email,password} = req.body;
-        const getUser = await User.findOne({email});
-        if(!getUser){
-            next(handleError(404,'Invalid Login Credentials!!'))
-        }
-        const hashedPassword = getUser.password;
-        const comparePassword = bcryptjs.compare(password,hashedPassword);
-        if(!comparePassword){
-            next(handleError(404,'Invalid Login Credentials!!'))
-        }
-        const token = jwt.sign({
-            _id: getUser._id,
-            name:getUser.name,
-            email:getUser.email,
-            avatar:getUser.avatar,
-            role:getUser.role,
-        }, process.env.JWT_SECRET);
-        res.cookie('access_token',token,{
-            httpOnly:true,
-            secure: process.env.NODE_ENV ==='production',
-            sameSite: process.env.NODE_ENV === 'production'?'none':'strict',
-            path:'/'
-        });
-        const newUser = getUser.toObject({getters:true});
-        delete newUser.password;
-        res.status(200).json({
-            success:true,
-            user:newUser,
-            message:'Login SuccessFull'
-        })
-    } catch (err) {
-        next(handleError(500,err.message));
+
+    const email = decodedToken.email.toLowerCase();
+    let user = await User.findOne({ email }).select('+password');
+    if (!user) {
+      user = await User.create({
+        name: decodedToken.name || email.split('@')[0],
+        email,
+        avatar: decodedToken.picture,
+        password: await bcryptjs.hash(crypto.randomUUID(), 12),
+      });
     }
-}
-export const GoogleLogin = async(req,res,next)=>{  
-    try {
-        const {name,email,avatar} = req.body;
-        let user;
-        user = await User.findOne({email});
-        if(!user){
-            const password = Math.random().toString();
-            const hashedPassword = bcryptjs.hashSync(password)
-            const newUser = new User({
-                name,email,password:hashedPassword,avatar
-            })
-            user = await newUser.save();
-        }
-        const token = jwt.sign({
-            _id: user._id,
-            name:user.name,
-            email:user.email,
-            avatar:user.avatar,
-            role:user.role
-        }, process.env.JWT_SECRET);
-        
-        res.cookie('access_token',token,{
-            httpOnly:true,
-            secure: process.env.NODE_ENV ==='production',
-            sameSite: process.env.NODE_ENV === 'production'?'none':'strict',
-            path:'/'
-        });
-        const newUser = user.toObject({getters:true});
-        delete newUser.password;
-        res.status(200).json({
-            success:true,
-            user:newUser,
-            message:'Login SuccessFull'
-        })
-    } catch (err) {
-        next(handleError(500,err.message));
-    }
-}
-export const Logout = async(req,res,next)=>{  
-    try {
-        res.clearCookie('access_token',{
-            httpOnly:true,
-            secure: process.env.NODE_ENV ==='production',
-            sameSite: process.env.NODE_ENV === 'production'?'none':'strict',
-            path:'/'
-        });
-        res.status(200).json({
-            success:true,
-            message:'LogOut SuccessFull'
-        })
-    } catch (err) {
-        next(handleError(500,err.message));
-    }
-}
+    if (user.status !== 'active') return next(handleError(403, 'This account has been suspended.'));
+
+    user.lastLoginAt = new Date();
+    await user.save();
+    createSession(res, user);
+    res.status(200).json({ success: true, user: publicUser(user), message: 'Signed in successfully.' });
+  } catch (error) {
+    if (error.code?.startsWith('auth/')) return next(handleError(401, 'Google sign-in could not be verified.'));
+    next(handleError(500, error.message));
+  }
+};
+
+export const Logout = async (req, res, next) => {
+  try {
+    res.clearCookie('access_token', cookieOptions);
+    res.status(200).json({ success: true, message: 'Signed out successfully.' });
+  } catch (error) {
+    next(handleError(500, error.message));
+  }
+};

@@ -1,98 +1,47 @@
-import { Card, CardContent } from '@/components/ui/card';
-import React, { useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Search, ShieldCheck, UserRoundCheck, UserRoundX } from 'lucide-react';
+import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
-import { usefetch } from '@/hooks/usefetch';
-import { getEnv } from '@/Helper/getEnv';
-import Loading from '@/components/Loading';
-import { MdDelete } from 'react-icons/md';
-import { deletedata } from '@/Helper/HandleDelete';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Card, CardContent } from '@/components/ui/card';
 import { showToast } from '@/Helper/ShowToast';
-import moment from 'moment/moment';
-import { Avatar, AvatarImage } from '@/components/ui/avatar';
-import usericon from '@/assets/Images/user.png';
 
 const Users = () => {
-    const [referesh, setRefreshData] = useState(false);
-    const { data, loading, error } = usefetch(
-        `${getEnv('VITE_API_BACKEND_URL')}/user/get-alluser`,
-        { method: 'get', credentials: 'include' },
-        [referesh]
-    );
-
-    const handleDelete = async (id) => {
-        const temp = await deletedata(`${getEnv('VITE_API_BACKEND_URL')}/user/delete/${id}`);
-        if (temp) {
-            showToast('success', 'User deleted!');
-            setRefreshData(!referesh);
-        } else {
-            showToast('error', "User couldn't be removed!");
-        }
-    };
-
-    if (loading) return <Loading />;
-    if (error) return <div className="text-red-500">Error: {error.message}</div>;
-
-    return (
-        <div className="p-4 flex flex-col gap-2">
-            <Card className="bg-white p-4 dark:bg-gray-900 dark:text-white shadow-lg">
-                <CardContent>
-                    <Table className="dark:border-gray-700">
-                        <TableHeader className="dark:bg-gray-800">
-                            <TableRow>
-                                <TableHead className="dark:text-gray-300">Role</TableHead>
-                                <TableHead className="dark:text-gray-300">Avatar</TableHead>
-                                <TableHead className="dark:text-gray-300">Name</TableHead>
-                                <TableHead className="dark:text-gray-300">Email</TableHead>
-                                <TableHead className="dark:text-gray-300">Registered</TableHead>
-                                <TableHead className="dark:text-gray-300">Action</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {data && data.users.length > 0 ? (
-                                data.users.map(user => (
-                                    <TableRow key={user._id} className="dark:border-gray-700">
-                                        <TableCell>{user?.role}</TableCell>
-                                        <TableCell>
-                                            <Avatar>
-                                                <AvatarImage src={user?.avatar || usericon} />
-                                            </Avatar>
-                                        </TableCell>
-                                        <TableCell>{user?.name}</TableCell>
-                                        <TableCell>{user?.email}</TableCell>
-                                        <TableCell>{moment(user.createdAt).format('DD-MM-YYYY')}</TableCell>
-                                        <TableCell className="flex gap-3">
-                                            <Button 
-                                                onClick={() => handleDelete(user._id)} 
-                                                variant="outline" 
-                                                className="hover:bg-red-700 hover:text-white dark:border-gray-600 dark:text-gray-300 dark:hover:bg-red-800 dark:hover:text-white" 
-                                                size="icon"
-                                            >
-                                                <MdDelete />
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                            ) : (
-                                <TableRow>
-                                    <TableCell colSpan="6" className="text-center dark:text-gray-400">
-                                        No Users Found!
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
-        </div>
-    );
+  const [search, setSearch] = useState('');
+  const [filters, setFilters] = useState({ role: '', status: '' });
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const loadMoreRef = useRef(null);
+  const queryClient = useQueryClient();
+  useEffect(() => { const timer = setTimeout(() => setDebouncedSearch(search), 350); return () => clearTimeout(timer); }, [search]);
+  const params = useMemo(() => new URLSearchParams({ limit: '25', ...(debouncedSearch && { q: debouncedSearch }), ...(filters.role && { role: filters.role }), ...(filters.status && { status: filters.status }) }).toString(), [debouncedSearch, filters]);
+  const usersQuery = useInfiniteQuery({
+    queryKey: ['users', params],
+    queryFn: ({ pageParam }) => api(`/user/get-alluser?${params}${pageParam ? `&cursor=${encodeURIComponent(pageParam)}` : ''}`),
+    initialPageParam: null,
+    getNextPageParam: (lastPage) => lastPage.nextCursor || undefined,
+  });
+  const statusMutation = useMutation({
+    mutationFn: ({ id, status }) => api(`/user/status/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) }),
+    onSuccess: (data) => { showToast('success', data.message); queryClient.invalidateQueries({ queryKey: ['users'] }); },
+    onError: (error) => showToast('error', error.message),
+  });
+  useEffect(() => {
+    if (!loadMoreRef.current || !usersQuery.hasNextPage) return undefined;
+    const observer = new IntersectionObserver(([entry]) => entry.isIntersecting && !usersQuery.isFetchingNextPage && usersQuery.fetchNextPage(), { rootMargin: '250px' });
+    observer.observe(loadMoreRef.current); return () => observer.disconnect();
+  }, [usersQuery.hasNextPage, usersQuery.isFetchingNextPage, usersQuery.fetchNextPage]);
+  const users = usersQuery.data?.pages.flatMap((page) => page.users) || [];
+  return (
+    <div className="mx-auto max-w-7xl space-y-6">
+      <section className="rounded-2xl border bg-gradient-to-br from-slate-950 to-slate-800 p-6 text-white"><p className="text-sm font-semibold uppercase tracking-[.18em] text-violet-300">Administration</p><h1 className="mt-2 text-3xl font-bold">User management</h1><p className="mt-2 text-slate-300">Search accounts, filter access, and suspend abusive users without destroying their audit history.</p></section>
+      <Card><CardContent className="space-y-4 p-5"><div className="flex flex-col gap-3 md:flex-row"><div className="relative flex-1"><Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Input value={search} onChange={(event) => setSearch(event.target.value)} className="pl-9" placeholder="Search by name or email" /></div><select className="rounded-md border bg-background px-3" value={filters.role} onChange={(e) => setFilters({ ...filters, role: e.target.value })}><option value="">All roles</option><option value="user">User</option><option value="author">Author</option><option value="editor">Editor</option><option value="admin">Admin</option></select><select className="rounded-md border bg-background px-3" value={filters.status} onChange={(e) => setFilters({ ...filters, status: e.target.value })}><option value="">All statuses</option><option value="active">Active</option><option value="suspended">Suspended</option></select></div>
+        <div className="divide-y">{users.map((user) => <article key={user._id} className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between"><div className="flex items-center gap-3"><Avatar><AvatarImage src={user.avatar} /><AvatarFallback>{user.name?.slice(0, 1)}</AvatarFallback></Avatar><div><p className="font-medium">{user.name}</p><p className="text-sm text-muted-foreground">{user.email}</p></div></div><div className="flex items-center gap-3"><Badge variant="secondary" className="capitalize">{user.role}</Badge><Badge className={user.status === 'active' ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100' : 'bg-red-100 text-red-800 hover:bg-red-100'}>{user.status}</Badge><Button size="sm" variant="outline" disabled={statusMutation.isPending} onClick={() => statusMutation.mutate({ id: user._id, status: user.status === 'active' ? 'suspended' : 'active' })}>{user.status === 'active' ? <><UserRoundX className="mr-2 h-4 w-4" /> Suspend</> : <><UserRoundCheck className="mr-2 h-4 w-4" /> Restore</>}</Button></div></article>)}</div>
+        {usersQuery.isLoading && <p className="py-10 text-center text-muted-foreground">Loading users…</p>}{usersQuery.isError && <p className="py-10 text-center text-red-600">{usersQuery.error.message}</p>}<div ref={loadMoreRef} className="h-6" />{usersQuery.isFetchingNextPage && <p className="text-center text-sm text-muted-foreground">Loading more…</p>}
+      </CardContent></Card>
+    </div>
+  );
 };
-
 export default Users;

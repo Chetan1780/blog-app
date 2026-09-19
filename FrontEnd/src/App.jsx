@@ -20,7 +20,6 @@ import Users from './pages/Users'
 import AuthRouteProt from './components/AuthRouteProt'
 import AuthRouteprotadmin from './components/AuthRouteprotadmin'
 import PublicRoute from './components/PublicRoute'
-// import "./App.css"
 const App = () => {
   return (
     <BrowserRouter>

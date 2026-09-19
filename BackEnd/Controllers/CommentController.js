@@ -1,85 +1,65 @@
-import {handleError}  from "../Helper/handleError.js";
-import Comment from "../models/CommentModel.js"
-import Blog from "../models/BlogModel.js";
-export const addComment = async (req,res,next)=>{
-    try {
-        const {user,blogid,comment} = req.body;
-        const newComment = new Comment({
-            user,
-            blogid,
-            comment
-        });
-        await newComment.save();
-        res.status(200).json({
-            success:true,
-            message:'Comment submitted!!',
-            comment: newComment
-        })
+import { handleError } from '../Helper/handleError.js';
+import Comment from '../models/CommentModel.js';
+import Blog from '../models/BlogModel.js';
+import { z } from 'zod';
 
-    } catch (error) {
-        next(handleError(500,error.message));
-    }
-} 
-export const getComments = async (req,res,next)=>{
-    try {
-        const {blogid} = req.params;
-        const comments = await Comment.find({blogid}).populate('user','name avatar').sort({createdAt:-1}).lean().exec();
-        res.status(200).json({
-            comments
-        })
+const commentSchema = z.object({
+  blogid: z.string().regex(/^[a-f\d]{24}$/i, 'Invalid blog.'),
+  comment: z.string().trim().min(1).max(1_000),
+});
 
-    } catch (error) {
-        next(handleError(500,error.message));
-    }
-} 
-export const commentCount = async (req,res,next)=>{
-    try {
-        const {blogid} = req.params;
-        const count = await Comment.countDocuments({blogid})
-        res.status(200).json({
-            count
-        })
-        
-    } catch (error) {
-        next(handleError(500,error.message));
-    }
-} 
+export const addComment = async (req, res, next) => {
+  try {
+    const result = commentSchema.safeParse(req.body);
+    if (!result.success) return next(handleError(400, result.error.issues[0].message));
+    const blog = await Blog.findById(result.data.blogid).select('_id status publishedAt');
+    if (!blog || blog.status === 'draft' || (blog.publishedAt && blog.publishedAt > new Date())) return next(handleError(404, 'Published blog not found.'));
+    const comment = await Comment.create({ user: req.user._id, blogid: blog._id, comment: result.data.comment });
+    res.status(201).json({ success: true, message: 'Comment submitted.', comment });
+  } catch (error) {
+    next(handleError(500, error.message));
+  }
+};
 
-export const getAllComments = async (req,res,next)=>{
-    try {
-        const user = req.user;
-        let comments;
-        const blogs = await Blog.find({author:user._id});
-        const blogIds = blogs.map(blog => blog._id);
-        if(user && user.role==='admin'){
-            comments = await Comment.find().populate('blogid', 'title slug category').populate('user','name').lean().exec();;
-        } else{
-            comments = await Comment.find({ blogid: { $in: blogIds } })
-            .populate('blogid', 'title slug category') 
-            .populate('user', 'name')   
-            .lean()
-            .exec();
-        }
-        res.status(200).json({
-            comments
-        })
+export const getComments = async (req, res, next) => {
+  try {
+    const comments = await Comment.find({ blogid: req.params.blogid }).populate('user', 'name avatar').sort({ createdAt: -1 }).limit(100).lean();
+    res.status(200).json({ comments });
+  } catch (error) {
+    next(handleError(400, 'Invalid blog identifier.'));
+  }
+};
 
-    } catch (error) {
-        next(handleError(500,error.message));
-    }
-} 
-export const deleteComment = async (req,res,next)=>{
-    try {
-        const {commendId} = req.params;
-        (commendId);
-        
-        await Comment.findByIdAndDelete(commendId)
-        res.status(200).json({
-            success:true,
-            message:"Comment Deleted!!"
-        })
+export const commentCount = async (req, res, next) => {
+  try {
+    const count = await Comment.countDocuments({ blogid: req.params.blogid });
+    res.status(200).json({ count });
+  } catch (error) {
+    next(handleError(400, 'Invalid blog identifier.'));
+  }
+};
 
-    } catch (error) {
-        next(handleError(500,error.message));
-    }
-} 
+export const getAllComments = async (req, res, next) => {
+  try {
+    const authoredBlogs = req.user.role === 'admin' ? [] : await Blog.find({ author: req.user._id }).distinct('_id');
+    const filter = req.user.role === 'admin' ? {} : { blogid: { $in: authoredBlogs } };
+    const comments = await Comment.find(filter).populate('blogid', 'title slug category').populate('user', 'name').sort({ createdAt: -1 }).limit(200).lean();
+    res.status(200).json({ comments });
+  } catch (error) {
+    next(handleError(500, error.message));
+  }
+};
+
+export const deleteComment = async (req, res, next) => {
+  try {
+    const comment = await Comment.findById(req.params.commendId);
+    if (!comment) return next(handleError(404, 'Comment not found.'));
+    const blog = await Blog.findById(comment.blogid).select('author');
+    const canDelete = req.user.role === 'admin' || String(comment.user) === String(req.user._id) || String(blog?.author) === String(req.user._id);
+    if (!canDelete) return next(handleError(403, 'You cannot delete this comment.'));
+    await comment.deleteOne();
+    res.status(200).json({ success: true, message: 'Comment deleted.' });
+  } catch (error) {
+    next(handleError(400, 'Invalid comment identifier.'));
+  }
+};

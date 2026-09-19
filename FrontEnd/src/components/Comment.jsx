@@ -34,7 +34,7 @@ const Comment = ({ props }) => {
     });
 
     const onSubmit = async (data) => {
-        const newData = { ...data, blogid: props.blogid, user: user.user._id };
+        const newData = { ...data, blogid: props.blogid };
         setisSubmit(true);
         try {
             const resp = await fetch(`${getEnv('VITE_API_BACKEND_URL')}/comment/add`, {

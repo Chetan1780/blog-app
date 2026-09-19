@@ -1,8 +1,7 @@
-import React from 'react'
 import { Button } from './ui/button'
 import { signInWithPopup } from 'firebase/auth'
 import { FcGoogle } from 'react-icons/fc';
-import { auth, provider } from '@/Helper/FIreBase';
+import { auth, isFirebaseConfigured, provider } from '@/Helper/FIreBase';
 import { getEnv } from '@/Helper/getEnv';
 import { showToast } from '@/Helper/ShowToast';
 import { useNavigate } from 'react-router-dom';
@@ -13,19 +12,18 @@ const GoogleLogin = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const handleLogin = async () => {
+        if (!isFirebaseConfigured || !auth || !provider) {
+            showToast('error', 'Google sign-in is not configured for this environment.');
+            return;
+        }
         try {
             const googleResponse = await signInWithPopup(auth, provider);
-            const user = googleResponse.user;
-            const data = {
-                name: user.displayName,
-                email: user.email,
-                avatar: user.photoURL
-            }
+            const idToken = await googleResponse.user.getIdToken();
             const resp = await fetch(`${getEnv('VITE_API_BACKEND_URL')}/auth/google-login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
-                body: JSON.stringify(data)
+                body: JSON.stringify({ idToken })
             })
             const temp = await resp.json();
             if (!resp.ok) {

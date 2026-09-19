@@ -1,4 +1,3 @@
-// server.js
 import cluster from 'cluster';
 import os from 'os';
 import { fileURLToPath } from 'url';
@@ -7,7 +6,7 @@ import { dirname } from 'path';
 const totalCpus = os.cpus().length;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const serverFilePath = `${__dirname}/index.js`; // Path to your index.js file
+const serverFilePath = `${__dirname}/index.js`; 
 
 if (cluster.isPrimary) {
   console.log(`Primary ${process.pid} is running`);

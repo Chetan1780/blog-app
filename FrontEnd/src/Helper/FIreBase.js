@@ -6,17 +6,21 @@ import { getEnv } from './getEnv';
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
+const apiKey = getEnv('VITE_FIREBASE_API_KEY') || getEnv('VITE_FIREBASE_API');
 const firebaseConfig = {
-  apiKey:getEnv('VITE_FIREBASE_API'),
-  authDomain: "blog-app-406c7.firebaseapp.com",
-  projectId: "blog-app-406c7",
-  storageBucket: "blog-app-406c7.firebasestorage.app",
-  messagingSenderId: "288239093954",
-  appId: "1:288239093954:web:363eca2cca272dd211535b"
+  apiKey,
+  authDomain: getEnv('VITE_FIREBASE_AUTH_DOMAIN'),
+  projectId: getEnv('VITE_FIREBASE_PROJECT_ID'),
+  storageBucket: getEnv('VITE_FIREBASE_STORAGE_BUCKET'),
+  messagingSenderId: getEnv('VITE_FIREBASE_MESSAGING_SENDER_ID'),
+  appId: getEnv('VITE_FIREBASE_APP_ID'),
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
-export {auth,provider};
+// Keep the rest of the application available when Google sign-in has not been
+// configured for a given environment.
+const isFirebaseConfigured = Boolean(apiKey);
+const app = isFirebaseConfigured ? initializeApp(firebaseConfig) : null;
+const auth = app ? getAuth(app) : null;
+const provider = app ? new GoogleAuthProvider() : null;
+
+export { auth, provider, isFirebaseConfigured };

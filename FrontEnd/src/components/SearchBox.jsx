@@ -1,29 +1,35 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Input } from './ui/input';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { RouteSearch } from '@/Helper/RouteName';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { RouteIndex, RouteSearch } from '@/Helper/RouteName';
 import { debounce } from 'lodash';
 
 const SearchBox = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [query, setQuery] = useState(searchParams.get('q') || '');
+  const location = useLocation();
+  const [query, setQuery] = useState(() => new URLSearchParams(location.search).get('q') || '');
   const navigate = useNavigate();
 
-  // Debounced function to update the URL when the user types
-  const updateSearchParams = debounce((searchTerm) => {
-    if (searchTerm.trim()) {
-      setSearchParams({ q: searchTerm });
-      navigate(RouteSearch(searchTerm), { replace: true });
-    } else {
-      setSearchParams({});
-    }
-  }, 500);
+  useEffect(() => {
+    const searchQuery = location.pathname === RouteSearch()
+      ? new URLSearchParams(location.search).get('q') || ''
+      : '';
+    setQuery(searchQuery);
+  }, [location.pathname, location.search]);
 
-  // Handle input change but do NOT trigger navigation immediately
+  const updateSearchRoute = useMemo(
+    () => debounce((searchTerm) => {
+      const trimmedSearchTerm = searchTerm.trim();
+      navigate(trimmedSearchTerm ? RouteSearch(trimmedSearchTerm) : RouteIndex, { replace: true });
+    }, 500),
+    [navigate]
+  );
+
+  useEffect(() => () => updateSearchRoute.cancel(), [updateSearchRoute]);
+
   const handleInputChange = (e) => {
     const searchTerm = e.target.value;
     setQuery(searchTerm);
-    updateSearchParams(searchTerm); // Updates URL with debounce
+    updateSearchRoute(searchTerm);
   };
 
   return (

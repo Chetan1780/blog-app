@@ -1,13 +1,14 @@
 import express from 'express';
 const UserRoute = express.Router();
-import {GoogleLogin, Login,Logout,Register} from '../Controllers/AuthController.js';
-import { deleteUser, getAllUsers, getUser,updateUser } from '../Controllers/Usercontroller.js';
+import { deleteUser, getAllUsers, getUser, updateUser, updateUserStatus } from '../Controllers/Usercontroller.js';
 import upload from '../Config/multer.js';
 import { authenticate } from '../Middleware/authenticate.js';
+import { authenticateadmin } from '../Middleware/authenticateadmin.js';
 UserRoute.use(authenticate)
 UserRoute.get('/get-user/:userId',getUser);
-UserRoute.get('/get-alluser',getAllUsers);
+UserRoute.get('/get-alluser', authenticateadmin, getAllUsers);
 UserRoute.put('/update-user/:userId', upload.single('file') ,updateUser);
-UserRoute.delete('/delete/:userid', deleteUser);
+UserRoute.patch('/status/:userId', authenticateadmin, updateUserStatus);
+UserRoute.delete('/delete/:userid', authenticateadmin, deleteUser);
 
 export default UserRoute;

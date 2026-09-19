@@ -12,5 +12,6 @@ const CommentSchema = new mongoose.Schema({
     },
     comment: { type: String, required: true, trim: true }
 }, { timestamps: true })
+CommentSchema.index({ blogid: 1, createdAt: -1 });
 const Comment = mongoose.model('Comment', CommentSchema, 'comments');
 export default Comment;

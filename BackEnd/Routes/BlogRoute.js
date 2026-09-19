@@ -1,7 +1,7 @@
 import express from 'express'
-import { addBlog, allBlog, deleteBlog, editBlog, getBlog, getBlogBycategory, getRelatedBlog, search, showBlog, updateBlog } from '../Controllers/BlogController.js';
+import { addBlog, allBlog, deleteBlog, editBlog, getBlog, getBlogBycategory, getPublicFeed, getRecentActivity, getRelatedBlog, recordView, search, showBlog, updateBlog } from '../Controllers/BlogController.js';
 import upload from '../Config/multer.js';
-import { authenticate } from '../Middleware/authenticate.js';
+import { authenticate, optionalAuthenticate } from '../Middleware/authenticate.js';
 
 const BlogRoute = express.Router();
 
@@ -12,10 +12,13 @@ BlogRoute.delete('/delete/:blogid',authenticate, deleteBlog);
 BlogRoute.get('/get-blog/:blogid',authenticate, showBlog);
 BlogRoute.get('/all-user-blog',authenticate,allBlog)
 ;
-BlogRoute.get('/all-blog',allBlog)
+BlogRoute.get('/all-blog', optionalAuthenticate, allBlog)
+BlogRoute.get('/feed', getPublicFeed);
+BlogRoute.get('/activity', authenticate, getRecentActivity);
+BlogRoute.post('/view/:slug', recordView);
 BlogRoute.get('/getblog/:slug', getBlog);
 BlogRoute.get('/getrelatedblog/:category/:currBlog', getRelatedBlog);
 BlogRoute.get('/getblogbycategory/:category', getBlogBycategory);
 BlogRoute.get('/search', search);
 
-export default BlogRoute; 
+export default BlogRoute;

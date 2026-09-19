@@ -9,22 +9,21 @@ import { debounce } from 'lodash';
 
 const LikeCount = ({ props }) => {
   const user = useSelector((state) => state.persistedReducer.user);
-  const userId = user.isLoggedIn ? user.user._id : null;
   const [likeCount, setLikeCount] = useState(0);
   const [liked, setLiked] = useState(false);
   const [animate, setAnimate] = useState(false);
 
   const { data } = usefetch(
-    `${getEnv('VITE_API_BACKEND_URL')}/like/get-like/${props.blogid}${userId ? `/${userId}` : ''}`,
+    `${getEnv('VITE_API_BACKEND_URL')}/like/get-like/${props.blogid}`,
     { method: 'get', credentials: 'include' },
-    [props.blogid, userId]
+    [props.blogid, user.isLoggedIn]
   );
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `${getEnv('VITE_API_BACKEND_URL')}/like/get-like/${props.blogid}${userId ? `/${userId}` : ''}`,
+          `${getEnv('VITE_API_BACKEND_URL')}/like/get-like/${props.blogid}`,
           { method: 'get', credentials: 'include' }
         );
 
@@ -44,7 +43,7 @@ const LikeCount = ({ props }) => {
     const interval = setInterval(fetchData, 45000);
 
     return () => clearInterval(interval);
-  }, [props.blogid, userId]);
+  }, [props.blogid, user.isLoggedIn]);
 
   useEffect(() => {
     if (data) {
@@ -60,7 +59,7 @@ const LikeCount = ({ props }) => {
           method: 'POST',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userid: userId, blogid: props.blogid }),
+          body: JSON.stringify({ blogid: props.blogid }),
         });
 
         const temp = await resp.json();
@@ -75,7 +74,7 @@ const LikeCount = ({ props }) => {
         showToast('error', err.message);
       }
     }, 500),
-    [userId, props.blogid]
+    [props.blogid]
   );
 
   const handleLike = () => {

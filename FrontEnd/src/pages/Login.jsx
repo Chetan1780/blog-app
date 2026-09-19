@@ -21,7 +21,7 @@ import { useDispatch } from "react-redux";
 import { setUser } from "@/redux/user/user.slice";
 
 const Login = () => {
-  const [loading, setLoading] = useState(false); // Loading state
+  const [loading, setLoading] = useState(false); 
 
   const formSchema = z.object({
     email: z.string().email(),

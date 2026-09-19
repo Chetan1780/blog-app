@@ -10,9 +10,11 @@ import { usefetch } from '@/hooks/usefetch';
 import { AvatarImage } from '@radix-ui/react-avatar';
 import { decode } from 'entities';
 import moment from 'moment';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Loading from '@/components/Loading';
+import { FiClock, FiEye } from 'react-icons/fi';
+import DOMPurify from 'dompurify';
 
 const BlogDetails = () => {
     const { blog, category } = useParams();
@@ -22,9 +24,21 @@ const BlogDetails = () => {
 
     const [refresh, setreFresh] = useState();
 
-    useEffect(() => { }, [refresh]);
+    // console.log(data);
+
+    useEffect(() => {
+        if (!data?.blog?._id || !blog) return;
+        const viewKey = `view-recorded:${blog}`;
+        if (sessionStorage.getItem(viewKey)) return;
+        sessionStorage.setItem(viewKey, 'true');
+
+        fetch(`${getEnv('VITE_API_BACKEND_URL')}/blog/view/${blog}`, { method: 'POST' }).catch(() => {
+            sessionStorage.removeItem(viewKey);
+        });
+    }, [blog, data?.blog?._id]);
 
     if (loading) return <Loading />;
+    if (error) return <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">This story could not be loaded.</div>;
     const sanitizedContent = data?.blog?.content
     ? decode(data.blog.content)
         .replace(/style="[^"]*"/g, '') // Remove inline styles
@@ -32,6 +46,10 @@ const BlogDetails = () => {
         .replace(/\s{2,}/g, ' ') // Remove multiple spaces
         .trim() // Trim extra whitespace
     : '';
+    const safeContent = DOMPurify.sanitize(sanitizedContent, {
+        USE_PROFILES: { html: true },
+        ADD_ATTR: ['target'],
+    });
 
 
     return (
@@ -45,7 +63,12 @@ const BlogDetails = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1.2, ease: "easeOut" }}
                     >
-                        <h1 className="text-xl font-bold mb-5 dark:text-white">{data.blog.title}</h1>
+                        <div className="mb-5 flex flex-wrap items-center gap-2">
+                            <span className="rounded-full bg-violet-100 px-3 py-1 text-sm font-semibold text-violet-800 dark:bg-violet-950 dark:text-violet-200">{data.blog.category.name}</span>
+                            {data.blog.tags?.map((tag) => <span key={tag} className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">#{tag}</span>)}
+                        </div>
+                        <h1 className="mb-3 text-3xl font-bold tracking-tight dark:text-white md:text-4xl">{data.blog.title}</h1>
+                        {data.blog.excerpt && <p className="mb-5 text-lg leading-8 text-muted-foreground">{data.blog.excerpt}</p>}
 
                         <div className="flex justify-between items-center">
                             <div className="flex justify-between items-center gap-4">
@@ -54,10 +77,12 @@ const BlogDetails = () => {
                                 </Avatar>
                                 <div>
                                     <p className="dark:text-gray-300">{data.blog.author.name}</p>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">{moment(data.blog.createdAt).format('DD-MM-YYYY')}</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">{moment(data.blog.publishedAt || data.blog.createdAt).format('DD MMM YYYY')}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between items-center gap-4">
+                                <span className="flex items-center gap-1 text-sm text-muted-foreground"><FiClock /> {data.blog.readingTime || 1} min read</span>
+                                <span className="flex items-center gap-1 text-sm text-muted-foreground"><FiEye /> {data.blog.viewCount || 0}</span>
                                 <LikeCount props={{ blogid: data.blog._id }} />
                                 <CommentCount props={{ blogid: data.blog._id }} />
                             </div>
@@ -70,7 +95,7 @@ const BlogDetails = () => {
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 1.2, ease: "easeOut" }}
                         >
-                            <img draggable="false" className="rounded-lg w-full h-full shadow-lg object-contain" src={data.blog.featuredImage} alt={data.blog.title} />
+                            <img draggable="false" className="rounded-lg w-full h-full shadow-lg object-contain" src={data.blog.featuredImage} alt={data.blog.featuredImageAlt || data.blog.title} />
                         </motion.div>
 
                         {/* Content Fade-In with Slight Scale-Up */}
@@ -79,7 +104,7 @@ const BlogDetails = () => {
                             initial={{ opacity: 0, scale: 0.98 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 1.5, ease: 'easeOut' }}
-                            dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+                            dangerouslySetInnerHTML={{ __html: safeContent }}
                         >
                             
 

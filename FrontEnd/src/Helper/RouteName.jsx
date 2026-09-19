@@ -33,8 +33,8 @@ export const RouteBlogByCategory = (category)=>{
     }
 }
 export const RouteSearch = (query)=>{
-    if(query){
-        return `/search?q=${query}`
+    if(query?.trim()){
+        return `/search?${new URLSearchParams({ q: query.trim() }).toString()}`
     }
     return '/search'
 }

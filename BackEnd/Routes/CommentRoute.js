@@ -6,6 +6,6 @@ CommentRoute.post('/add', authenticate ,addComment);
 CommentRoute.get('/get-comments/:blogid',getComments);
 CommentRoute.get('/get-count/:blogid',commentCount);
 CommentRoute.get('/get-all-comment',authenticate,getAllComments);
-CommentRoute.delete('/delete/:commendId',authenticate,deleteComment);
+CommentRoute.delete('/delete/:commendId', authenticate, deleteComment);
 
 export default CommentRoute;

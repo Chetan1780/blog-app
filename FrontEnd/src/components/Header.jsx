@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Button } from './ui/button'
 import { MdLogin } from "react-icons/md";
 import SearchBox from './SearchBox';
-import { RouteBlogAdd, RouteIndex, RouteLogin } from '@/Helper/RouteName';
+import { RouteBlog, RouteBlogAdd, RouteIndex, RouteLogin } from '@/Helper/RouteName';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   DropdownMenu,
@@ -16,7 +16,7 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import userIcon from '@/assets/Images/user.png'
 import { FaUser } from "react-icons/fa";
-import { MdOutlinePostAdd, MdLogout } from "react-icons/md";
+import { MdOutlinePostAdd, MdLogout, MdSpaceDashboard } from "react-icons/md";
 import { getEnv } from '@/Helper/getEnv';
 import { showToast } from '@/Helper/ShowToast';
 import { removeUser } from '@/redux/user/user.slice';
@@ -32,7 +32,7 @@ const Header = () => {
 
   const handleLogOut = async () => {
     let resp = await fetch(`${getEnv('VITE_API_BACKEND_URL')}/auth/logout`, {
-      method: 'get',
+      method: 'post',
       credentials: 'include'
     })
     const data = await resp.json();
@@ -101,6 +101,12 @@ const Header = () => {
                 <Link to={RouteBlogAdd}>
                   <MdOutlinePostAdd />
                   Add Blog
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild className="cursor-pointer flex items-center gap-2">
+                <Link to={RouteBlog}>
+                  <MdSpaceDashboard />
+                  Dashboard
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
